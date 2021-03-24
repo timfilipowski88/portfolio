@@ -33,7 +33,6 @@
                     <div class="card-body" id="hours_card">
                         <p>You have 12 to 14 hours to go.</p>
                         <p>To Calculate Estimated Hours to Go, Choose a Date</p>
-                        <form action="">
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group">
@@ -42,10 +41,9 @@
                                     <input type="number">
                                 </div>
                                 <div class="col-6">
-                                    <button class="btn btn-primary" type="submit" id="hours_btn">add P</button>
+                                    <button class="btn btn-primary" id="hours_btn">Calculate Hours</button>
                                 </div>
                             </div>
-                        </form>
                     </div>
                     <div class="card-footer">You need to average 3 to 6 hours a day. </div>
                 </div>
@@ -86,26 +84,96 @@
                 </div>
 
                 <div class="tab-pane fade" id="pills-collection" role="tabpanel" aria-labelledby="pills-collection-tab">
-                    <h4>Collections</h4>
                     <div class="row">
                         <table class="table table-striped">
-                            <thead>
+                            <thead class="thead-light">
                                 <th>Collection Name</th>
                                 <th>Due Date</th>
-                                <th>Priority</th>
                                 <th>Min Hours</th>
                                 <th>Max Hours</th>
+                                <th>Priority</th>
                                 <th>Completed</th>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><a href="/view/{{collection.id}}">Django</a></td>
-                                    <td>03.30.2020</td>
-                                    <td> 1 </td>
-                                    <td> 12 </td>
-                                    <td> 22 </td>
-                                    <td> N </td>
-                                </tr>
+                                {% for collection in collections %}
+                                <form action="/main/update_collection/{{ collection.id }}" method="POST">
+                                    {% csrf_token %}
+                                    <tr>
+                                        <td><button type="button" class="ml-2 btn btn-success" data-toggle="modal"
+                                                data-target="#{{collection.name}}Modal"
+                                                data-whatever="@fat">{{collection.name }}</button></a></td>
+                                        <td><input type="date" name="due_date" id="due_date" class="form-control"
+                                                value="{{collection.due_date|date:'Y-m-d' }}"></td>
+                                        <td> 5 </td>
+                                        <td> 6 </td>
+                                        <td><select name="priority" class="form-control" id="priority">
+                                                <option  value="{{collection.priority}}">{{collection.priority}}</option>
+                                                <option value=1>1</option>
+                                                <option value=2>2</option>
+                                                <option value=3>3</option>
+                                        </select></td>
+                                        <td>
+                                            <input  type="checkbox" name="completed" id="completed" value="{{assignment.completed}}">
+                                        </td>
+                                    </tr>
+                                </form>
+
+                                <div class="modal fade" id="{{collection.name}}Modal" tabindex="-1" role="dialog"
+                                    aria-labelledby="{{collection.name}}ModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl"" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="{{collection.name}}ModalLabel">View or Edit Collection</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if messages %}
+                                                {% for message in messages %}
+                                                <p class="{{ message.tags }}">{{ message }}</p>
+                                                {% endfor %}
+                                                {% endif %}
+                                                <form action='/main/update_collection/{{collection.id}}' method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="collection_name-name"
+                                                                    class="col-form-label">Collection Name:</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="collection_name" id="collection_name-name" value="{{collection.name}}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="collection-text"
+                                                            class="col-form-label">Description:</label>
+                                                        <textarea class="form-control" name="description"
+                                                            id="collection-text">{{collection.description}}</textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="priority">Priority</label>
+                                                        <select name="priority" class="form-control" id="priority">
+                                                            <option  value="{{collection.priority}}">Current: {{collection.priority}}</option>
+                                                            <option value=1>1</option>
+                                                            <option value=2>2</option>
+                                                            <option value=3>3</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="checkbox" name="completed" id="completed">
+                                                        <label class="ml-3" for="completed" value="{{collection.completed}}">Completed</label>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-success">Update Collection</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -113,10 +181,9 @@
 
                 <div class="tab-pane fade" id="pills-assignments" role="tabpanel"
                     aria-labelledby="pills-assignments-tab">
-                    <h4>Assignments</h4>
                     <div class="row">
                         <table class="table table-striped">
-                            <thead>
+                            <thead class="thead-light">
                                 <th>Assignment Name</th>
                                 <th>Due Date</th>
                                 <th>Collection</th>
@@ -135,7 +202,9 @@
                                                 data-whatever="@fat">{{ assignment.name }}</button></td>
                                         <td><input type="date" name="due_date" id="due_date" class="form-control"
                                                 value="{{assignment.due_date|date:'Y-m-d' }}"></td>
-                                        <td><a href="">{{ assignment.collection.name }}</a></td>
+                                        <td><button type="button" class="ml-2 btn btn-success" data-toggle="modal"
+                                                data-target="#ass_{{assignment.collection.name}}Modal"
+                                                data-whatever="@fat">{{assignment.collection.name }}</button></a></td>
                                         <td><input type="number" class="form-control" name="min_hours" id="min_hours-name" value="{{assignment.min_hours}}"></td>
                                         <td><input type="number" class="form-control" name="max_hours" id="max_hours-name" value="{{assignment.max_hours}}"></td>
                                         <td><select name="priority" class="form-control" id="priority">
@@ -149,9 +218,10 @@
                                         </td>
                                     </tr>
                                 </form>
+        
                                 <div class="modal fade" id="{{assignment.name}}Modal" tabindex="-1" role="dialog"
                                     aria-labelledby="{{assignment.name}}ModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
+                                    <div class="modal-dialog modal-xl"" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="{{assignment.name}}ModalLabel">View or Edit Assignment</h5>
@@ -168,7 +238,6 @@
                                                 {% endif %}
                                                 <form action='/main/add_assignment/' method="POST">
                                                     {% csrf_token %}
-                                                    <h4>Add Assignment</h4>
                                                     <div class="row">
                                                         <div class="col-6">
                                                             <div class="form-group">
@@ -238,19 +307,75 @@
                                         </div>
                                     </div>
                                 </div>
+        
+                                <div class="modal fade" id="ass_{{assignment.collection.name}}Modal" tabindex="-1" role="dialog"
+                                    aria-labelledby="ass_{{assignment.collection.name}}ModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl" modal-xl" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="{{assignment.collection.name}}ModalLabel">View or Edit Collection</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if messages %}
+                                                {% for message in messages %}
+                                                <p class="{{ message.tags }}">{{ message }}</p>
+                                                {% endfor %}
+                                                {% endif %}
+                                                <form action='/main/update_collection/{{assignment.collection.id}}' method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="collection_name-name"
+                                                                    class="col-form-label">Collection Name:</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="collection_name" id="collection_name-name" value="{{assignment.collection.name}}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="collection-text"
+                                                            class="col-form-label">Description:</label>
+                                                        <textarea class="form-control" name="description"
+                                                            id="collection-text">{{assignment.collection.description}}</textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="priority">Priority</label>
+                                                        <select name="priority" class="form-control" id="priority">
+                                                            <option  value="{{assignment.collection.priority}}">Current: {{assignment.collection.priority}}</option>
+                                                            <option value=1>1</option>
+                                                            <option value=2>2</option>
+                                                            <option value=3>3</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="checkbox" name="completed" id="completed">
+                                                        <label class="ml-3" for="completed" value="{{assignment.collection.completed}}">Completed</label>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-success">Update Collection</button>
+                                                    <button type="submit" class="ml-2 btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+        
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
-
+            
         </div>
-
+        
         <div class="modal fade" id="collectionModal" tabindex="-1" role="dialog" aria-labelledby="collectionModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-xl"" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Add Collection</h5>
@@ -266,7 +391,6 @@
                         {% endif %}
                         <form action='/main/add_collection/' method="POST">
                             {% csrf_token %}
-                            <h4>Add Collection</h4>
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group">
@@ -308,7 +432,7 @@
 
         <div class="modal fade" id="assignmentModal" tabindex="-1" role="dialog" aria-labelledby="assignmentModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-xl"" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="assignmentModalLabel">Add Assignment</h5>
@@ -324,7 +448,6 @@
                         {% endif %}
                         <form action='/main/add_assignment/' method="POST">
                             {% csrf_token %}
-                            <h4>Add Assignment</h4>
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group">
