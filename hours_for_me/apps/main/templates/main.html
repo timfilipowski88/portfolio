@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    {% load static %}
+    <title>Level Up Login</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h1>Hours for Me!</h1>
+                <br>
+                <h3>Welcome {{ logged_user.first_name }}</h3>
+                <p>This page is desgined for students(aren't we all students?) to make sets of assignments that belong
+                    to classes, just like in elementary! For each assignment you estimate the minimum and maximum hours
+                    you think it will take, when they are due, and more. </p>
+                <p>Then you can use the "Hours to Go!" calculator to set a date in the future and it will figure out how
+                    many hours on assignments need to be completed by then!</p>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">Hours to Go!</div>
+                    <div class="card-body">This is dead but will work soon!</div>
+                    <div class="card-footer">This is where the buttons go.</div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="ml-2 nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
+                        aria-controls="pills-home" aria-selected="true">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="ml-2 nav-link" id="pills-classes-tab" data-toggle="pill" href="#pills-classes" role="tab"
+                        aria-controls="pills-classes" aria-selected="false">Classes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="ml-2 nav-link" id="pills-assignments-tab" data-toggle="pill" href="#pills-assignments"
+                        role="tab" aria-controls="pills-assignments" aria-selected="false">Assignments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="ml-2 nav-link" id="pills-add_class-tab" data-toggle="pill" href="#pills-add_class"
+                        role="tab" aria-controls="pills-add_class" aria-selected="false">Add Class</a>
+                </li>
+                <li class="nav-item">
+                    <a class="ml-2 nav-link" id="pills-add_assignment-tab" data-toggle="pill"
+                        href="#pills-add_assignment" role="tab" aria-controls="pills-add_assignment"
+                        aria-selected="false">Add Assignment</a>
+                </li>
+
+                <!-- <button type="button" class="ml-2 btn btn-success" data-toggle="modal" data-target="#classModal"
+                    data-whatever="@fat">Add Class</button>
+                <button type="button" class="ml-2 btn btn-success" data-toggle="modal" data-target="#assignmentModal"
+                    data-whatever="@getbootstrap">Add Assignment</button>
+                <button class="ml-2 btn btn-danger" type="submit" action="main:logout">Log Out</button> -->
+                <hr>
+        </div>
+        <div class="row">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <h4>Home</h4>
+                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam officia explicabo fugit commodi.
+                        Quod, quis nemo doloribus distinctio aliquid consequatur ratione animi ducimus facere nostrum
+                        dicta obcaecati. Corporis praesentium fugit voluptatibus, dignissimos rerum nulla ducimus eum ut
+                        veniam excepturi eius!</p>
+                </div>
+                <div class="tab-pane fade" id="pills-classes" role="tabpanel" aria-labelledby="pills-classes-tab">
+                    <h4>Classes</h4>
+                    <div class="row">
+                        <table class="table table-striped">
+                            <thead>
+                                <th>Class Name</th>
+                                <th>Due Date</th>
+                                <th>Priority</th>
+                                <th>Completed</th>
+                            </thead>
+                            <tbody>
+                                <!-- {% for class in classes %}
+                                <tr>
+                                    <td><a href="/view/{{class.id}}">{{ class.name }}</a></td>
+                                    <td>'due date'</td>
+                                    <td>{{ class.due_date|date:"Y-m-d" }}</td>
+                                    <td>{{ class.priority }}</td>
+                                    <td>{{ class.completed }}</td>
+                                </tr>
+                                {% endfor %} -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-assignments" role="tabpanel"
+                    aria-labelledby="pills-assignments-tab">
+                    <h4>Assignments</h4>
+                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam officia explicabo fugit commodi.
+                        Quod, quis nemo doloribus distinctio aliquid consequatur ratione animi ducimus facere nostrum
+                        dicta obcaecati. Corporis praesentium fugit voluptatibus, dignissimos rerum nulla ducimus eum ut
+                        veniam excepturi eius!</p>
+                </div>
+                <div class="tab-pane fade" id="pills-add_class" role="tabpanel" aria-labelledby="pills-add_class-tab">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                    {% endif %}
+                    <form action='/main/add_class/' method="POST">
+                        {% csrf_token %}
+                        <h4>Add Class</h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="class_name-name" class="col-form-label">Class Name:</label>
+                                    <input type="text" class="form-control" name="class_name" id="class_name-name">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="due_date">Due Date:</label>
+                                    <input type="date" name="due_date" id="due_date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="class-text" class="col-form-label">Description:</label>
+                            <textarea class="form-control" name="description" id="class-text"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select name="priority" class="form-control" id="priority">
+                                <option value=1>1</option>
+                                <option value=2>2</option>
+                                <option value=3>3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="completed" id="completed">
+                            <label class="ml-3" for="completed">Completed</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add Class</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="pills-add_assignment" role="tabpanel"
+                    aria-labelledby="pills-add_assignment-tab">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                    {% endif %}
+                    <form action='/main/add_assignment/' method="POST">
+                        {% csrf_token %}
+                        <h4>Add Assignment</h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="assignment_name-name" class="col-form-label">Assignment Name:</label>
+                                    <input type="text" class="form-control" name="assignment_name"
+                                        id="assignment_name-name">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="due_date">Due Date:</label>
+                                    <input type="date" name="due_date" id="due_date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="min_hours-name" class="col-form-label">Minimum Hours:</label>
+                                    <input type="number" class="form-control" name="min_hours" id="min_hours-name">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="max_hours-name" class="col-form-label">Maximum Hours:</label>
+                                    <input type="number" class="form-control" name="max_hours" id="max_hours-name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignment-text" class="col-form-label">Description:</label>
+                            <textarea class="form-control" name="description" id="assignment-text"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select name="priority" class="form-control" id="priority">
+                                <option value=1>1</option>
+                                <option value=2>2</option>
+                                <option value=3>3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="completed" id="completed">
+                            <label class="ml-3" for="completed">Completed</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add Assignment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="modal fade" id="assignmentModal" tabindex="-1" role="dialog" aria-labelledby="assignmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="assignmentModalLabel">Add Assignment</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST">
+                            <div class="form-group">
+                                <label for="assignment-name" class="col-form-label">Assignment:</label>
+                                <input type="text" class="form-control" id="assignment-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="assignment-text" class="col-form-label">Description:</label>
+                                <textarea class="form-control" id="assignment-text"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select class="form-control" id="priority">
+                                    <option name='one'>1</option>
+                                    <option name='two'>2</option>
+                                    <option name='three'>3</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" name="completed" id="completed">
+                                <label class="ml-3" for="completed">Completed</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success" action='main:add_assignment'>Add Assignment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="classModal" tabindex="-1" role="dialog" aria-labelledby="classModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Class</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="class-name" class="col-form-label">Class:</label>
+                                <input type="text" class="form-control" id="class-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="class-text" class="col-form-label">Description:</label>
+                                <textarea class="form-control" id="class-text"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select class="form-control" id="priority">
+                                    <option name='one'>1</option>
+                                    <option name='two'>2</option>
+                                    <option name='three'>3</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" name="completed" id="completed">
+                                <label class="ml-3" for="completed">Completed</label>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success" action='main:add_class'>Add Class</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
