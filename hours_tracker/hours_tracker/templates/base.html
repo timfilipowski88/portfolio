@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    {% load static %}
+    <script src="{% static 'js/script.js' %}"></script>
+    <title>{% block title %}Level Up Login{% endblock %}</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h2 class="m-3">Hours to Go!</h2>
+                <h4 class="m-3">Welcome {{ logged_user.first_name }}</h4>
+                <p>This page is desgined for students(aren't we all students?) to make sets of assignments that belong
+                    to a Collection, just like in elementary! For each assignment you estimate the minimum and maximum
+                    hours
+                    you think it will take, when they are due, and more. </p>
+                <p>Then you can use the "Hours to Go!" calculator to set a date in the future and it will figure out how
+                    many hours on assignments need to be completed by then!</p>
+            </div>
+            <div class="col-6"> 
+                <div class="card">
+                    <div class="card-header">Hours to Go!</div>
+                    <div class="card-body" id="hours_card">
+                        <p>You have 12 to 14 hours to go.</p>
+                        <p>To Calculate Estimated Hours to Go, Choose a Date</p>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <input type="date" name="due_date" id="due_date" class="form-control">
+                                    </div>
+                                    <input type="number">
+                                </div>
+                                <div class="col-6">
+                                    <button class="btn btn-primary" id="hours_btn">Calculate Hours</button>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="card-footer">You need to average 3 to 6 hours a day. </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="m-2 nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
+                        aria-controls="pills-home" aria-selected="true">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="m-2 nav-link" id="pills-collections-tab" data-toggle="pill" href="#pills-collection"
+                        role="tab" aria-controls="pills-collection" aria-selected="false">Collections</a>
+                </li>
+                <li class="nav-item">
+                    <a class="m-2 nav-link" id="pills-assignments-tab" data-toggle="pill" href="#pills-assignments"
+                        role="tab" aria-controls="pills-assignments" aria-selected="false">Assignments</a>
+                </li>
+                <button type="button" class="m-2 btn btn-success" data-toggle="modal" data-target="#add_collectionModal"
+                    data-whatever="@fat">Add Collection</button>
+                <button type="button" class="m-2 btn btn-success" data-toggle="modal" data-target="#add_assignmentModal"
+                    data-whatever="@getbootstrap">Add Assignment</button>
+                <button class="ml-2 btn btn-danger" type="submit" action="main:logout">Log Out</button>
+                <hr>
+        </div>
+        <div class="row" id="content_display">
+
+            <div class="tab-content" id="pills-tabContent">
+
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <h4>Home</h4>
+                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam officia explicabo fugit commodi.
+                        Quod, quis nemo doloribus distinctio aliquid consequatur ratione animi ducimus facere nostrum
+                        dicta obcaecati. Corporis praesentium fugit voluptatibus, dignissimos rerum nulla ducimus eum ut
+                        veniam excepturi eius!</p>
+                </div>
+
+                <div class="tab-pane fade" id="pills-collection" role="tabpanel" aria-labelledby="pills-collection-tab">
+                    <div class="row">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <th>Collection Name</th>
+                                <th>Due Date</th>
+                                <th>Min Hours</th>
+                                <th>Max Hours</th>
+                                <th>Priority</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody id="collections_table_body">
+                                {% block collection_form %}
+                                {% endblock %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="pills-assignments" role="tabpanel"
+                    aria-labelledby="pills-assignments-tab">
+                    <div class="row">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <th>Assignment Name</th>
+                                <th>Due Date</th>
+                                <th>Collection</th>
+                                <th>Min Hours</th>
+                                <th>Max Hours</th>
+                                <th>Priority</th>
+                                <th>Completed</th>
+                            </thead>
+                            <tbody id="assignments_table_body">
+                                {% block assignment_form %}
+                                {% endblock %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="modal fade" id="add_collectionModal" tabindex="-1" role="dialog" aria-labelledby="collectionModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl"" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Collection</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <p class="{{ message.tags }}">{{ message }}</p>
+                        {% endfor %}
+                        {% endif %}
+                        <form method="POST" id="add_collection">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="collection_name-name" class="col-form-label">Collection
+                                            Name:</label>
+                                        <input type="text" class="form-control" name="collection_name"
+                                            id="collection_name-name">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="due_date">Due Date:</label>
+                                        <input type="date" name="due_date" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="collection-text" class="col-form-label">Description:</label>
+                                <textarea class="form-control" name="description" id="collection-text"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select name="priority" class="form-control">
+                                    <option value=1>1</option>
+                                    <option value=2>2</option>
+                                    <option value=3>3</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" name="completed" value="True">
+                                <label class="ml-3" for="completed">Completed</label>
+                            </div>
+                            <button type="submit" class="btn btn-success">Add Collection</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="add_assignmentModal" tabindex="-1" role="dialog" aria-labelledby="assignmentModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl"" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="assignmentModalLabel">Add Assignment</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <p class="{{ message.tags }}">{{ message }}</p>
+                        {% endfor %}
+                        {% endif %}
+                        <form method="POST" id="add_assignment">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="assignment_name-name" class="col-form-label">Assignment
+                                            Name:</label>
+                                        <input type="text" class="form-control" name="assignment_name"
+                                            id="assignment_name-name">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="due_date">Due Date:</label>
+                                        <input type="date" name="due_date" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="min_hours-name" class="col-form-label">Minimum Hours:</label>
+                                        <input type="number" class="form-control" name="min_hours" id="min_hours-name">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="max_hours-name" class="col-form-label">Maximum Hours:</label>
+                                        <input type="number" class="form-control" name="max_hours" id="max_hours-name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="collection">Class:</label>
+                                <select name="collection_id" class="form-control">
+                                    {% for collection in collections %}
+                                    <option value="{{ collection.id }}">{{ collection.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="assignment-text" class="col-form-label">Description:</label>
+                                <textarea class="form-control" name="description" id="assignment-text"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select name="priority" class="form-control">
+                                    <option value=1>1</option>
+                                    <option value=2>2</option>
+                                    <option value=3>3</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" name="completed" value="True">
+                                <label class="ml-3" for="completed">Completed</label>
+                            </div>
+                            <button type="submit" class="btn btn-success">Add Assignment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+</body>
+
+<!-- Extra Tab Modals -->
+<!-- </div>
+                    
+                <div class="tab-pane fade" id="pills-add_collection" role="tabpanel" aria-labelledby="pills-add_collection-tab">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                    {% endif %}
+                    <form action='/main/add_collection/' method="POST">
+                        {% csrf_token %}
+                        <h4>Add Collection</h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="collection_name-name" class="col-form-label">Collection Name:</label>
+                                    <input type="text" class="form-control" name="collection_name" id="collection_name-name">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="due_date">Due Date:</label>
+                                    <input type="date" name="due_date" id="due_date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="collection-text" class="col-form-label">Description:</label>
+                            <textarea class="form-control" name="description" id="collection-text"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select name="priority" class="form-control" id="priority">
+                                <option value=1>1</option>
+                                <option value=2>2</option>
+                                <option value=3>3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="completed" id="completed" value="null">
+                            <label class="ml-3" for="completed">Completed</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add Collection</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="pills-add_assignment" role="tabpanel"
+                    aria-labelledby="pills-add_assignment-tab">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                    {% endif %}
+                    <form action='/main/add_assignment/' method="POST">
+                        {% csrf_token %}
+                        <h4>Add Assignment</h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="assignment_name-name" class="col-form-label">Assignment Name:</label>
+                                    <input type="text" class="form-control" name="assignment_name"
+                                        id="assignment_name-name">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="due_date">Due Date:</label>
+                                    <input type="date" name="due_date" id="due_date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="min_hours-name" class="col-form-label">Minimum Hours:</label>
+                                    <input type="number" class="form-control" name="min_hours" id="min_hours-name">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="max_hours-name" class="col-form-label">Maximum Hours:</label>
+                                    <input type="number" class="form-control" name="max_hours" id="max_hours-name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignment-text" class="col-form-label">Description:</label>
+                            <textarea class="form-control" name="description" id="assignment-text"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select name="priority" class="form-control" id="priority">
+                                <option value=1>1</option>
+                                <option value=2>2</option>
+                                <option value=3>3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="completed" id="completed">
+                            <label class="ml-3" for="completed">Completed</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add Assignment</button>
+                    </form>
+                </div> -->
+
+</html>

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import messages
 from datetime import datetime
 from .models import *
@@ -10,15 +10,29 @@ def index(request):
     else:
         context = {
             'logged_user': User.objects.get(id=request.session['logged_user']),
-            'collections': Collection.objects.all(),
-            'assignments': Assignment.objects.all(),
+            'collections': Collection.objects.all().order_by("due_date"),
+            'assignments': Assignment.objects.all().order_by("due_date"),
 
             # 'all_trips': Trip.objects.all(),
             # 'excluded_trips': Trip.objects.exclude(trips_joined=request.session['logged_user']),
         }
         test = Assignment.objects.all()
         print(test)
-    return render(request, "main.html", context)
+    return render(request, "base.html", context)
+
+
+def get_collection_form(request):
+    context = {
+        'collections': Collection.objects.all().order_by("due_date"),
+    }
+    return render(request, 'collection_form.html', context)
+
+
+def get_assignment_form(request):
+    context = {
+        'assignments': Assignment.objects.all().order_by("due_date"),
+    }
+    return render(request, 'assignment_form.html', context)
 
 
 def add_collection(request):
@@ -38,7 +52,11 @@ def add_collection(request):
             completed=request.POST.get('completed', False),
             creator=user,
         )
-        return redirect('/main/index/')
+        this_collection.save()
+        context = {
+            'collection': this_collection,
+        }
+        return render(request, "add_collection_form.html", context)
 
 
 def add_assignment(request):
@@ -52,10 +70,8 @@ def add_assignment(request):
         # possible Checkbox Bug Fix
         # if request.POST['completed'] = "on":
         #     completed=True
-
-
         user = User.objects.get(id=request.session['logged_user'])
-        collection = Collection.objects.get(id=request.POST['collection'])
+        collection = Collection.objects.get(id=request.POST['collection_id'])
         this_assignment = Assignment.objects.create(
             creator=user,
             collection=collection,
@@ -67,4 +83,41 @@ def add_assignment(request):
             priority=request.POST['priority'],
             completed=request.POST.get('completed', False),
         )
+        this_assignment.save()
+        context ={
+            'assignment': this_assignment
+        }
+        return render(request, 'add_assignment_form.html', context)
+
+
+def update_assignment(request, assignment_id):
+    errors = Assignment.objects.assignment_validator(request.POST)
+
+    if errors:
+        for k, v in errors.items():
+            messages.error(request, v)
         return redirect('/main/index/')
+    else:
+        assignment_form = Assignment.objects.get(id=request.POST['assignment_id'])
+        new_collection_id = Collection.objects.get(id=request.POST['collection'])
+        assignment_form.collection=new_collection_id,
+        assignment_form.name=request.POST['assignment_name'],
+        assignment_form.description=request.POST['description'],
+        assignment_form.due_date=request.POST['due_date'],
+        assignment_form.min_hours=request.POST['min_hours'],
+        assignment_form.max_hours=request.POST['max_hours'],
+        assignment_form.priority=request.POST['priority'],
+        assignment_form.completed=request.POST.get('completed', False)
+        assignment_form.save()
+        success = True
+        console.log(success)
+        context = {
+            'assignments': Assignment.objects.all().order_by("due_date"),
+        }
+        return render(request, 'assignment_form.html', context)
+
+
+def update_collection(request):
+    pass
+
+    

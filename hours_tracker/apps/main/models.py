@@ -59,7 +59,7 @@ class Assignment(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     due_date = models.DateField(max_length=100)
-    completed = models.BooleanField('completed', default=False)
+    completed = models.BooleanField('completed', null=False)
     min_hours = models.PositiveIntegerField()
     max_hours = models.PositiveIntegerField()
     priority = models.PositiveIntegerField()

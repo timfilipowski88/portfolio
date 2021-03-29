@@ -1,0 +1,255 @@
+$(document).ready(function(){
+    // Set document that on double* clicking with elements with class ".editable"    * could be single click with "click"
+    $(document).on("click",".editable_text", function (){
+        // Set current text in element equal to var value
+        var value=$(this).text();
+        //  Set var input to an <input> field with the previous elements value passed into <input value='"++">
+        var input="<input type='text' class='input-data' value='"+value+"' class='form-control'>";
+        // Then setting the original element to have the html stored in var input
+        $(this).html(input);
+        // remove class "editable" so that the info stays there
+    });
+    // upon form "assignment_table_row" recieving sumbit action
+    $('.update_assignment_btn').click(function(){
+        $.ajax({
+            url: '/update_assignment',
+            method: 'POST',
+            data: $(this).serialize()
+        })
+        .done(function(res) {
+            if res == True:
+                console.log("a successful update")
+        });
+    });
+});
+
+
+
+
+def update_assignment(request):
+    errors = Assignment.objects.assignment_validator(request.POST)
+
+    if errors:
+        for k, v in errors.items():
+            messages.error(request, v)
+        return redirect('/main/index/')
+    else:
+        assignment_form = Form.objects.filter(id="assignment_id")
+        new_collection_id = Collection.objects.get(id=request.POST['collection'])
+        assignment_form.collection=new_collection_id,
+        assignment_form.name=request.POST['assignment_name'],
+        assignment_form.description=request.POST['description'],
+        assignment_form.due_date=request.POST['due_date'],
+        assignment_form.min_hours=request.POST['min_hours'],
+        assignment_form.max_hours=request.POST['max_hours'],
+        assignment_form.priority=request.POST['priority'],
+        assignment_form.completed=request.POST.get('completed', False)
+        assignment_form.save()
+        success = True
+        console.log(success)
+        return HttpResponse(request, success=success)
+
+
+
+
+
+
+//   Also doing one thin on input focus out I will remove the input box and add the value
+
+
+
+
+
+                <div class="tab-pane fade" id="pills-assignments" role="tabpanel"
+                    aria-labelledby="pills-assignments-tab">
+                    <div class="row">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <th>Assignment Name</th>
+                                <th>Due Date</th>
+                                <th>Collection</th>
+                                <th>Min Hours</th>
+                                <th>Max Hours</th>
+                                <th>Priority</th>
+                                <th>Completed</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody id="assignments_table_body">
+                                {% for assignment in assignments %}
+                                <form class="assignment_table_row">
+                                    <tr>
+                                        <td class="editable_text" data-id="{{assignment.id}}" data-id="name">{{assignment.name}}</td>
+                                        <td class="editable" data-id="{{assignment.id}}" data-id="due_date"><input type="date" name="due_date" id="due_date" class="form-control"
+                                                value="{{assignment.due_date|date:'Y-m-d' }}"></td>
+                                        <td class="editable" data-id="{{assignment.collection.id}}" data-id="collection_id">
+                                            <select name="collection_id" id="collection_select">
+                                                <option value="{{assignment.collection.id}}">{{assignment.collection.name}}</option>
+                                                {% for collection in collections %}
+                                                <option value="{{collection.id}}">{{collection.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td class="editable" data-id="{{assignment.id}}" data-id="min_hours"><input type="number" class="form-control" name="min_hours" id="min_hours-name" value="{{assignment.min_hours}}"></td>
+                                        <td class="editable" data-id="{{assignment.id}}" data-id="max_hours"><input type="number" class="form-control" name="max_hours" id="max_hours-name" value="{{assignment.max_hours}}"></td>
+                                        <td class="editable" data-id="{{assignment.id}}" data-id="priority"><select name="priority" class="form-control" id="priority">
+                                                <option  value="{{assignment.priority}}">{{assignment.priority}}</option>
+                                                <option value=1>1</option>
+                                                <option value=2>2</option>
+                                                <option value=3>3</option>
+                                        </select></td>
+                                        <td class="editable" data-id="{{assignment.id}}" data-id="completed">
+                                            <input  type="checkbox" name="completed" id="completed" value="{{assignment.completed}}">
+                                        </td>
+                                        <td><input type="hidden" name="assignment_id" value="{{assignment.id}}"><button class="btn btn-success update_assignment_btn">Update</button></td>
+                                    </tr>
+        
+                                <div class="modal fade" id="{{assignment.name}}Modal" tabindex="-1" role="dialog"
+                                    aria-labelledby="{{assignment.name}}ModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl"" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="{{assignment.name}}ModalLabel">View or Edit Assignment</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if messages %}
+                                                {% for message in messages %}
+                                                <p class="{{ message.tags }}">{{ message }}</p>
+                                                {% endfor %}
+                                                {% endif %}
+                                                <form action='/main/add_assignment/' method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="assignment_name-name"
+                                                                    class="col-form-label">Assignment Name:</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="assignment_name" id="assignment_name-name" value="{{assignment.name}}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="due_date">Due Date:</label>
+                                                                <input type="date" name="due_date" id="due_date"
+                                                                    class="form-control" value="{{assignment.due_date|date:'Y-m-d' }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="min_hours-name"
+                                                                    class="col-form-label">Minimum Hours:</label>
+                                                                <input type="number" class="form-control" name="min_hours" id="min_hours-name" value="{{assignment.min_hours}}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="max_hours-name"
+                                                                    class="col-form-label">Maximum Hours:</label>
+                                                                <input type="number" class="form-control"
+                                                                    name="max_hours" id="max_hours-name" value="{{assignment.max_hours}}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="collection">Class:</label>
+                                                        <select name="collection" class="form-control" id="collection">
+                                                            <option value="{{assignment.collection}}">{{assignment.collection.name}}</option>
+                                                            {% for collection in collections %}
+                                                            <option value="{{collection.id }}">{{ collection.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="assignment-text"
+                                                            class="col-form-label">Description:</label>
+                                                        <textarea class="form-control" name="description"
+                                                            id="assignment-text">{{assignment.description}}</textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="priority">Priority</label>
+                                                        <select name="priority" class="form-control" id="priority">
+                                                            <option  value="{{assignment.priority}}">Current: {{assignment.priority}}</option>
+                                                            <option value=1>1</option>
+                                                            <option value=2>2</option>
+                                                            <option value=3>3</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="checkbox" name="completed" id="completed">
+                                                        <label class="ml-3" for="completed" value="{{assignment.completed}}">Completed</label>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-success">Add
+                                                        Assignment</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+        
+                                <div class="modal fade" id="ass_{{assignment.collection.name}}Modal" tabindex="-1" role="dialog"
+                                    aria-labelledby="ass_{{assignment.collection.name}}ModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl" modal-xl" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="{{assignment.collection.name}}ModalLabel">View or Edit Collection</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if messages %}
+                                                {% for message in messages %}
+                                                <p class="{{ message.tags }}">{{ message }}</p>
+                                                {% endfor %}
+                                                {% endif %}
+                                                <form action='/main/update_collection/{{assignment.collection.id}}' method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="collection_name-name"
+                                                                    class="col-form-label">Collection Name:</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="collection_name" id="collection_name-name" value="{{assignment.collection.name}}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="collection-text"
+                                                            class="col-form-label">Description:</label>
+                                                        <textarea class="form-control" name="description"
+                                                            id="collection-text">{{assignment.collection.description}}</textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="priority">Priority</label>
+                                                        <select name="priority" class="form-control" id="priority">
+                                                            <option  value="{{assignment.collection.priority}}">Current: {{assignment.collection.priority}}</option>
+                                                            <option value=1>1</option>
+                                                            <option value=2>2</option>
+                                                            <option value=3>3</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="checkbox" name="completed" id="completed">
+                                                        <label class="ml-3" for="completed" value="{{assignment.collection.completed}}">Completed</label>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-success">Update Collection</button>
+                                                    <button type="submit" class="ml-2 btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </form>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
