@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    {% load static %}
+    <title>Level Up Login</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Hours for Me</h1>
+        <p>Register or Sign in to start yourself!</p>
+        <br>
+        <div class="row">
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+            <div class="col">
+                <h4>Register</h4>
+                <form action="/register/" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" name="first_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" name="last_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="email_address">Email Address</label>
+                        <input type="text" name="email_address" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" name="password"class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input type="password" name="confirm_password"class="form-control">
+                    </div>
+                    <button class="btn btn-primary" type="submit">Register</button>
+                </form>
+            </div>
+            <div class="col">
+                <h4>Login</h4>
+                <form action="/login/" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="email_address">Email Address</label>
+                        <input type="text" name="email_address"class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" name="password"class="form-control">
+                    </div>
+                    <button class="btn btn-primary" type="submit">Login</button>
+                </form>
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -16,40 +16,7 @@
 
 <body>
     <div class="container">
-        <div class="row">
-            <div class="col-6">
-                <h2 class="m-3">Hours to Go!</h2>
-                <h4 class="m-3">Welcome {{ logged_user.first_name }}</h4>
-                <p>This page is desgined for students(aren't we all students?) to make sets of assignments that belong
-                    to a Collection, just like in elementary! For each assignment you estimate the minimum and maximum
-                    hours
-                    you think it will take, when they are due, and more. </p>
-                <p>Then you can use the "Hours to Go!" calculator to set a date in the future and it will figure out how
-                    many hours on assignments need to be completed by then!</p>
-            </div>
-            <div class="col-6"> 
-                <div class="card">
-                    <div class="card-header">Hours to Go!</div>
-                    <div class="card-body" id="hours_card">
-                        <p>You have 12 to 14 hours to go.</p>
-                        <p>To Calculate Estimated Hours to Go, Choose a Date</p>
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <input type="date" name="due_date" id="due_date" class="form-control">
-                                    </div>
-                                    <input type="number">
-                                </div>
-                                <div class="col-6">
-                                    <button class="btn btn-primary" id="hours_btn">Calculate Hours</button>
-                                </div>
-                            </div>
-                    </div>
-                    <div class="card-footer">You need to average 3 to 6 hours a day. </div>
-                </div>
-            </div>
-        </div>
-        <hr>
+        <br>
         <div class="row">
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item">
@@ -68,19 +35,52 @@
                     data-whatever="@fat">Add Collection</button>
                 <button type="button" class="m-2 btn btn-success" data-toggle="modal" data-target="#add_assignmentModal"
                     data-whatever="@getbootstrap">Add Assignment</button>
-                <button class="ml-2 btn btn-danger" type="submit" action="main:logout">Log Out</button>
+                <button type="button" class="m-2 btn btn-danger" type="submit" action="main:logout">Log Out</button>
                 <hr>
         </div>
+        <hr>
         <div class="row" id="content_display">
 
             <div class="tab-content" id="pills-tabContent">
 
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                    <h4>Home</h4>
-                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam officia explicabo fugit commodi.
-                        Quod, quis nemo doloribus distinctio aliquid consequatur ratione animi ducimus facere nostrum
-                        dicta obcaecati. Corporis praesentium fugit voluptatibus, dignissimos rerum nulla ducimus eum ut
-                        veniam excepturi eius!</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <h2 class="m-3">Hours to Go!</h2>
+                            <h4 class="m-3">Welcome {{ logged_user.first_name }}</h4>
+                            <p>This page is desgined for students(aren't we all students?) to make sets of assignments
+                                that belong
+                                to a Collection, just like in elementary! For each assignment you estimate the minimum
+                                and maximum
+                                hours
+                                you think it will take, when they are due, and more. </p>
+                            <p>Then you can use the "Hours to Go!" calculator to set a date in the future and it will
+                                figure out how
+                                many hours on assignments need to be completed by then!</p>
+                        </div>
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">Hours to Go!</div>
+                                <div class="card-body" id="hours_card">
+                                    <p>You have 12 to 14 hours to go.</p>
+                                    <p>To Calculate Estimated Hours to Go, Choose a Date</p>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <input type="date" name="due_date" id="due_date" class="form-control">
+                                            </div>
+                                            <input type="number">
+                                        </div>
+                                        <div class="col-6">
+                                            <button class="btn btn-primary" id="hours_btn">Calculate Hours</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">You need to average 3 to 6 hours a day. </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="tab-pane fade" id="pills-collection" role="tabpanel" aria-labelledby="pills-collection-tab">
@@ -92,7 +92,7 @@
                                 <th>Min Hours</th>
                                 <th>Max Hours</th>
                                 <th>Priority</th>
-                                <th>Action</th>
+                                <th colspan="3">Action</th>
                             </thead>
                             <tbody id="collections_table_body">
                                 {% block collection_form %}
@@ -105,30 +105,57 @@
                 <div class="tab-pane fade" id="pills-assignments" role="tabpanel"
                     aria-labelledby="pills-assignments-tab">
                     <div class="row">
-                        <table class="table table-striped">
-                            <thead class="thead-light">
+                        <table id="assignments_table" class="table table-striped">
+                            <tr class="thead-light">
                                 <th>Assignment Name</th>
                                 <th>Due Date</th>
                                 <th>Collection</th>
                                 <th>Min Hours</th>
                                 <th>Max Hours</th>
                                 <th>Priority</th>
-                                <th>Completed</th>
-                            </thead>
-                            <tbody id="assignments_table_body">
-                                {% block assignment_form %}
-                                {% endblock %}
-                            </tbody>
+                                <th colspan="3">
+                                    <center>Action</center>
+                                </th>
+                            </tr>
+                            {% if assignments %}
+                            {% for assignment in assignments %}
+                            <tr id="assignment-{{assignment.id}}">
+                                <td class="assignmentName assignmentData" name="name">{{ assignment.name }}</td>
+                                <td class="assignmentDueDate assignmentData" name="due_date">
+                                    {{assignment.due_date|date:'Y-m-d' }}</td>
+                                <td class="assignmentCollection assignmentData" name="collection">
+                                    {{assignment.collection.name }}</td>
+                                <td class="assignmentMin assignmentData" name="min_hours">{{assignment.min_hours}}</td>
+                                <td class="assignmentMax assignmentData" name="max_hours">{{assignment.max_hours}}</td>
+                                <td class="assignmentPriority assignmentData" name="priority">{{assignment.priority}}
+                                </td>
+                                <td align="center">
+                                    <button class="btn btn-secondary" onClick="editAssignment({{assignment.id}})"
+                                        data-toggle="modal" data-target="assignmentModal">EDIT</button>
+                                </td>
+                                <td align="center">
+                                    <button class="btn btn-success"
+                                        onClick="changeComplete({{assignment.id}})">COMPLETE</button>
+                                </td>
+                                <td align="center">
+                                    <button class="btn btn-danger"
+                                        onClick="deleteAssignment({{assignment.id}})">DELETE</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            No Assignments yet!
+                            {% endif %}
                         </table>
                     </div>
                 </div>
             </div>
-            
+
         </div>
-        
-        <div class="modal fade" id="add_collectionModal" tabindex="-1" role="dialog" aria-labelledby="collectionModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-xl"" role="document">
+
+        <div class="modal fade" id="add_collectionModal" tabindex="-1" role="dialog"
+            aria-labelledby="collectionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl"" role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Add Collection</h5>
@@ -183,9 +210,9 @@
             </div>
         </div>
 
-        <div class="modal fade" id="add_assignmentModal" tabindex="-1" role="dialog" aria-labelledby="assignmentModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-xl"" role="document">
+        <div class="modal fade" id="add_assignmentModal" tabindex="-1" role="dialog"
+            aria-labelledby="assignmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl"" role=" document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="assignmentModalLabel">Add Assignment</h5>
@@ -199,7 +226,7 @@
                         <p class="{{ message.tags }}">{{ message }}</p>
                         {% endfor %}
                         {% endif %}
-                        <form method="POST" id="add_assignment">
+                        <form id="add_assignment" action="/main/add_assignment/">
                             {% csrf_token %}
                             <div class="row">
                                 <div class="col-6">
@@ -263,9 +290,7 @@
         </div>
 
     </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
-    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
     </script>
