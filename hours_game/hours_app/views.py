@@ -44,15 +44,52 @@ def login(request):
 
 
 def context(request):
-    completed_assignments = Assignment.objects.filter(completed=True)
-    incomplete_assignments = Assignment.objects.filter(completed=False)
-    collections = Collection.objects.all()
-    context = {
-        'completed_assignments': completed_assignments,
-        'incomplete_assignments': incomplete_assignments,
-        'collections' : collections,
-    }
-    return render(request, 'assignment.html', context)
+    due_date = request.session['due_date']
+    if due_date:
+        days_available = request.session['days_available']
+        incomplete_assignments = Assignment.objects.filter(completed=False)
+        max_hours = 0
+        min_hours = 0
+        for assignment in incomplete_assignments:
+            if str(assignment.due_date) <= due_date:
+                max_hours += assignment.max_hours
+                min_hours += assignment.min_hours
+
+        # date_difference = due_date.days - date_now.days
+        # if date_difference.days == 0:
+        #     date_difference.days += 1
+
+        min_avg = min_hours / int(days_available)
+        max_avg = max_hours / int(days_available)
+        min_avg = round(min_avg, 1)
+        max_avg = round(max_avg, 1)
+        completed_assignments = Assignment.objects.filter(completed=True).order_by("due_date")
+        incomplete_assignments = Assignment.objects.filter(completed=False).order_by("due_date")
+        collections = Collection.objects.all()
+        context = {
+            'completed_assignments': completed_assignments,
+            'incomplete_assignments': incomplete_assignments,
+            'collections': collections,
+            'min_total': min_hours,
+            'max_total': max_hours,
+            'min_avg': min_avg,
+            'max_avg': max_avg,
+            'due_date': due_date,
+            'days_available': days_available,
+        }
+        return render(request, 'assignment.html', context)
+
+
+    else:
+        completed_assignments = Assignment.objects.filter(completed=True).order_by("due_date")
+        incomplete_assignments = Assignment.objects.filter(completed=False).order_by("due_date")
+        collections = Collection.objects.all()
+        context = {
+            'completed_assignments': completed_assignments,
+            'incomplete_assignments': incomplete_assignments,
+            'collections': collections,
+        }
+        return render(request, 'assignment.html', context)
 
 
 
@@ -63,6 +100,8 @@ def add_collection(request):
     if errors:
         for k, v in errors.items():
             messages.error(request, v)
+            # messages.info('Check form for error messages')
+
         return redirect('/context/')
     else:
         user = User.objects.get(id=request.session['logged_user'])
@@ -71,7 +110,7 @@ def add_collection(request):
             description=request.POST['description'],
             due_date=request.POST['due_date'],
             priority=request.POST['priority'],
-            # completed=request.POST.get('completed', False),
+            completed=request.POST.get('completed', False),
             creator=user,
         )
         this_collection.save()
@@ -87,6 +126,8 @@ def add_assignment(request):
     if errors:
         for k, v in errors.items():
             messages.error(request, v)
+            # messages.info('Check form for error messages')
+
         return redirect('/context/')
     else:
         # possible Checkbox Bug Fix
@@ -103,7 +144,7 @@ def add_assignment(request):
             min_hours=request.POST['min_hours'],
             max_hours=request.POST['max_hours'],
             priority=request.POST['priority'],
-            # completed=request.POST.get('completed', False),
+            completed=request.POST.get('completed', False),
         )
         this_assignment.save()
         context ={
@@ -146,10 +187,36 @@ def delete_collection(request, id):
     collection.delete()
     return redirect('/context/')
 
+def change_complete(request, id):
+    assignment = Assignment.objects.get(id=id)
+    if assignment.completed == True:
+        assignment.completed = False
+    else:
+        assignment.completed = True
+    assignment.save()
+    return redirect('/context/')
+
+
+
 def calculate_hours(request):
-    pass
+    request.session['due_date'] = request.POST['due_date']
+    request.session['days_available'] = request.POST['days_available']
+    return redirect('/context/')
 
-
+    # date_now = datetime.now()
+    # incomplete_assignments = Assignment.objects.filter(completed=False)
+    # for assignment in incomplete_assignments:
+    #     if assignment.due_date < due_date:
+    #         max_hours += assignment.max_hours
+    #         min_hours += assignment.min_hours
+    # date_difference = due_date - date_now
+    # min_avg = min_hours / date_difference.days
+    # max_avg = max_hours / date_difference.days
+    # request.session['min_total'] = min_hours
+    # request.session['max_total'] = max_hours
+    # request.session['min_avg'] = min_avg
+    # request.session['max_avg'] = max_avg
+    # request.session['due_date'] = due_date
 
 
 # class AssignmentView(ListView):

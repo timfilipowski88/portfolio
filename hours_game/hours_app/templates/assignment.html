@@ -24,14 +24,24 @@
                 <div class="mt-4 card">
                     <div class="card-header">Hours to Go!</div>
                     <div class="card-body" id="hours_card">
-                        <p>To Calculate Hours to Go, Choose a Date</p>
-                        <form action="">
+                        <p>To Calculate Hours to Go, Choose a Date & How Many Days You Have Available.</p>
+                        <form action="/calculate-hours/" method="POST">
+                            {% csrf_token %}
                             <div class="row">
+                                {% if request.session.due_date %}
+                                <div class="col-6">
+                                    <input type="date" name="due_date" id="due_date" class="form-control" value="{{due_date}}">
+                                </div>
+                                {% else %}
                                 <div class="col-6">
                                     <input type="date" name="due_date" id="due_date" class="form-control">
                                 </div>
-                                <div class="col-6">
-                                    <button class="btn btn-warning" id="hours_btn">Calculate Hours</button>
+                                {% endif %}
+                                <div class="col-2">
+                                    <input type="number" name="days_available" id="days_available" class="form-control" value="{{days_available}}">
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-warning" id="hours_btn" type="submit">Calculate Hours</button>
                                 </div>
                             </div>
                         </form>
@@ -39,8 +49,8 @@
                 </div>
                 <div class="card-footer">
                     <h5>Hours to Go!</h5>
-                    <p>You need to average | <strong>#</strong> to <strong>#</strong> | hours a day.</p>
-                    <p>You have | <strong>#</strong> to <strong>#</strong> | hours to go.</p>
+                    <p>You need to average | {{min_avg}} to {{max_avg}} | hours a day.</p>
+                    <p>You have | {{min_total}} to {{max_total}} | hours to go.</p>
                 </div>
             </div>
         </div>
@@ -66,7 +76,7 @@
                         data-toggle="modal" data-target="#{{assignment.name}}Modal"
                         data-whatever="@fat">{{ assignment.name }}</button></td>
                 <td class="assignmentCollection assignmentData" name="collection"><button type="button"
-                        class="ml-2 btn btn-success" data-toggle="modal"
+                        class="ml-2 btn btn-primary" data-toggle="modal"
                         data-target="#ass_{{assignment.collection.name}}Modal" data-whatever="@fat">{{assignment.collection.name}}</td>
                 <td class="assignmentDueDate assignmentData" name="due_date">{{assignment.due_date|date:'Y-m-d' }}</td>
                 <td class="assignmentPriority assignmentData" name="priority">{{assignment.priority}}</td>
@@ -75,10 +85,10 @@
                 <td class="assignmentMax assignmentData" name="max_hours">{{assignment.max_hours}}</td>
                 <!-- <td class=".d-none assignmentCompleted assignmentData" name="completed">{{assignment.complete}}</td> -->
                 <td align="center">
-                    <button class="btn btn-success" onClick="changeComplete({{assignment.id}})">COMPLETE</button>
+                    <a class="btn btn-success" href="/change_complete/{{assignment.id}}">COMPLETE</a>
                 </td>
                 <td align="center">
-                    <button class="btn btn-danger" onClick="assignmentDelete({{assignment.id}})">DELETE</button>
+                    <a href="/delete_assignment/{{assignment.id}}" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
 
@@ -247,7 +257,7 @@
                         data-toggle="modal" data-target="#{{assignment.name}}Modal"
                         data-whatever="@fat">{{ assignment.name }}</button></td>
                 <td class="assignmentCollection assignmentData" name="collection"><button type="button"
-                        class="ml-2 btn btn-success" data-toggle="modal"
+                        class="ml-2 btn btn-primary" data-toggle="modal"
                         data-target="#ass_{{assignment.collection.name}}Modal"
                         data-whatever="@fat">{{assignment.collection.name }}</button></td>
                 <td class="assignmentDueDate assignmentData" name="due_date">{{assignment.due_date|date:'Y-m-d' }}</td>
@@ -257,10 +267,10 @@
                 <td class="assignmentMax assignmentData" name="max_hours">{{assignment.max_hours}}</td>
                 <!-- <td class=".d-none assignmentCompleted assignmentData" name="completed">{{assignment.complete}}</td> -->
                 <td align="center">
-                    <button class="btn btn-info" onClick="changeComplete({{assignment.id}})">MAKE DUE</button>
+                    <a class="btn btn-info" href="/change_complete/{{assignment.id}}">MAKE DUE</a>
                 </td>
                 <td align="center">
-                    <button class="btn btn-danger" onClick="assignmentDelete({{assignment.id}})">DELETE</button>
+                    <a href="/delete_assignment/{{assignment.id}}" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
 
@@ -296,7 +306,7 @@
                                         <div class="form-group">
                                             <label for="due_date">Due Date:</label>
                                             <input type="date" name="due_date" id="due_date" class="form-control"
-                                                value="{{assignment.due_date|date:'Y-m-d' }}">
+                                                value="{{assignment.due_date|date:'Y-m-d'}}">
                                         </div>
                                     </div>
                                 </div>
@@ -342,7 +352,8 @@
                                         <option value=3>3</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <!-- Dead Checkbox -->
+                                <!-- <div class="form-group">
                                     {% if assignment.completed == True %}
                                     <input type="checkbox" name="completed" id="completed" value={{assignment.completed}} checked>
                                     {% else %}
@@ -350,12 +361,12 @@
                                     {% endif %}
                                     <label class="ml-3" for="completed"
                                         value="{{assignment.completed}}">Completed</label>
-                                </div>
-
+                                </div> -->
                                 <input type="hidden" name="assignment_id" value="{{assignment.id}}">
                                 <button type="submit" class="btn btn-success">Update
                                     Assignment</button>
-                                <button type="submit" class="ml-2 btn btn-danger">Delete</button>
+                                <a href="/delete_assignment/{{assignment.id}}" class="btn btn-danger">Delete</a>
+
                             </form>
                         </div>
                     </div>
@@ -406,14 +417,16 @@
                                         <option value=3>3</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <!-- Dead Checkbox -->
+                                <!-- <div class="form-group">
                                     <input type="checkbox" name="completed">
                                     <label class="ml-3" for="completed"
                                         value="{{assignment.collection.completed}}">Completed</label>
-                                </div>
+                                </div> -->
+
                                 <button type="submit" class="btn btn-success">Update
                                     Course</button>
-                                <button type="submit" class="ml-2 btn btn-danger">Delete</button>
+                                <a href="/delete_collection/{{assignment.collection.id}}" class="btn btn-danger">Delete</a>
                             </form>
                         </div>
                     </div>
@@ -630,10 +643,15 @@
                     <option value=3>3</option>
                 </select>
             </div>
-            <div class="form-group">
+
+            <!-- Dead Completed tab -->
+            
+            <!-- <div class="form-group">
                 <input type="checkbox" name="completed" value="True">
                 <label class="ml-3" for="completed">Completed</label>
-            </div>
+            </div> -->
+
+
             <button type="submit" class="btn btn-success">Add Assignment</button>
         </form>
 
@@ -661,12 +679,15 @@
                         <input type="text" class="form-control" name="name">
                     </div>
                 </div>
+
+<!--                 
                 <div class="col-6">
                     <div class="form-group">
                         <label for="due_date">Due Date:</label>
                         <input type="date" name="due_date" class="form-control">
                     </div>
                 </div>
+                -->
             </div>
             <div class="form-group">
                 <label for="collection-text" class="col-form-label">Description:</label>
