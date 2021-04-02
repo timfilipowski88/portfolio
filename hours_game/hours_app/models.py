@@ -73,8 +73,6 @@ class AssignmentManager(models.Manager):
         errors = {}
         if len(postData['assignment_name']) < 5:
             errors['name'] = "Error, Name must be at least 5 characters."
-        if len(postData['description']) < 10:
-            errors['description'] = "Error, Description must be more than 10 characters."
         return errors
 
 
@@ -83,7 +81,7 @@ class Collection(models.Model):
         User, related_name='created_collections', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    due_date = models.DateField(max_length=100)
+    due_date = models.DateField(max_length=100, null=True)
     completed = models.BooleanField('completed', default=False)
     priority = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)

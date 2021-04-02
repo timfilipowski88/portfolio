@@ -61,8 +61,10 @@ def context(request):
 
         min_avg = min_hours / int(days_available)
         max_avg = max_hours / int(days_available)
-        min_avg = round(min_avg, 1)
-        max_avg = round(max_avg, 1)
+        mid_avg = (max_avg + min_avg) / 2
+        mid_avg = round(mid_avg, 1)
+        min_avg = round(min_avg)
+        max_avg = round(max_avg)
         completed_assignments = Assignment.objects.filter(completed=True).order_by("due_date")
         incomplete_assignments = Assignment.objects.filter(completed=False).order_by("due_date")
         collections = Collection.objects.all()
@@ -74,6 +76,7 @@ def context(request):
             'max_total': max_hours,
             'min_avg': min_avg,
             'max_avg': max_avg,
+            'mid_avg': mid_avg,
             'due_date': due_date,
             'days_available': days_available,
         }
@@ -108,9 +111,9 @@ def add_collection(request):
         this_collection = Collection.objects.create(
             name=request.POST['name'],
             description=request.POST['description'],
-            due_date=request.POST['due_date'],
+            # due_date=request.POST['due_date'],
             priority=request.POST['priority'],
-            completed=request.POST.get('completed', False),
+            # completed=request.POST.get('completed', False),
             creator=user,
         )
         this_collection.save()
@@ -139,7 +142,7 @@ def add_assignment(request):
             creator=user,
             collection=collection,
             name=request.POST['assignment_name'],
-            description=request.POST['description'],
+            # description=request.POST['description'],
             due_date=request.POST['due_date'],
             min_hours=request.POST['min_hours'],
             max_hours=request.POST['max_hours'],
