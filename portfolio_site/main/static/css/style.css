@@ -1,0 +1,29 @@
+h1 {
+    color: blue;
+}
+
+/* Style the Navbar */
+
+#navbar {
+    overflow: hidden;
+    background-color: #cfcfcf;
+}
+
+#navbar a, button {
+    float: left;
+    padding: 10px;
+}
+
+#navbar .icon {
+    width: 40px;
+    height: 40px;
+}
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.sticky + main {
+    padding-top: 60px;
+}
