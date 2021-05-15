@@ -42,6 +42,8 @@ class User(models.Model):
     last_name = models.CharField(max_length=255)
     email_address = models.CharField(max_length=55)
     password = models.CharField(max_length=150)
+    days_available = models.PositiveIntegerField(null=True)
+    due_date = models.DateField(max_length=100, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -107,4 +109,23 @@ class Assignment(models.Model):
     objects = AssignmentManager()
 
 
+class WorklogManager(models.Manager):
+    def worklog_validator(self, postData):
+        errors = {}
+        if len(postData['date']) < 2:
+            errors['Date'] = "Error, Date must be selected."
+        if len(postData['description']) < 2:
+            errors['Description'] = "Error, Description must be at least 2 characters."
+
+
+
+class Worklog(models.Model):
+    creator = models.ForeignKey(User, related_name='has_worklogs', on_delete=models.CASCADE)
+    date = models.DateField(max_length=100)
+    description = models.TextField()
+    hours = models.DecimalField(decimal_places=3, max_digits=100, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = WorklogManager()
 

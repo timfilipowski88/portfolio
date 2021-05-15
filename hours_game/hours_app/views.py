@@ -44,9 +44,10 @@ def login(request):
 
 
 def context(request):
-    due_date = request.session['due_date']
+    logged_user = User.objects.get(id=request.session['logged_user'])
+    due_date = str(logged_user.due_date)
     if due_date:
-        days_available = request.session['days_available']
+        days_available = logged_user.days_available
         incomplete_assignments = Assignment.objects.filter(completed=False)
         max_hours = 0
         min_hours = 0
@@ -65,9 +66,14 @@ def context(request):
         mid_avg = round(mid_avg, 1)
         min_avg = round(min_avg)
         max_avg = round(max_avg)
-        completed_assignments = Assignment.objects.filter(completed=True).order_by("due_date")
+        completed_max = 0
+        completed_min = 0
+        completed_assignments = Assignment.objects.filter(completed=True).order_by("-due_date")
         incomplete_assignments = Assignment.objects.filter(completed=False).order_by("due_date")
         collections = Collection.objects.all()
+        for assignment in completed_assignments:
+            completed_max += assignment.max_hours
+            completed_min += assignment.min_hours
         context = {
             'completed_assignments': completed_assignments,
             'incomplete_assignments': incomplete_assignments,
@@ -77,12 +83,13 @@ def context(request):
             'min_avg': min_avg,
             'max_avg': max_avg,
             'mid_avg': mid_avg,
-            'due_date': due_date,
+            'completed_min': completed_min,
+            'completed_max': completed_max,
+            'due_date': str(due_date),
             'days_available': days_available,
+            'logged_user': User.objects.get(id=request.session['logged_user'])
         }
         return render(request, 'assignment.html', context)
-
-
     else:
         completed_assignments = Assignment.objects.filter(completed=True).order_by("due_date")
         incomplete_assignments = Assignment.objects.filter(completed=False).order_by("due_date")
@@ -142,7 +149,7 @@ def add_assignment(request):
             creator=user,
             collection=collection,
             name=request.POST['assignment_name'],
-            # description=request.POST['description'],
+            description=request.POST['description'],
             due_date=request.POST['due_date'],
             min_hours=request.POST['min_hours'],
             max_hours=request.POST['max_hours'],
@@ -202,8 +209,10 @@ def change_complete(request, id):
 
 
 def calculate_hours(request):
-    request.session['due_date'] = request.POST['due_date']
-    request.session['days_available'] = request.POST['days_available']
+    logged_user = User.objects.get(id=request.session['logged_user'])
+    logged_user.due_date = request.POST['due_date']
+    logged_user.days_available = request.POST['days_available']
+    logged_user.save()
     return redirect('/context/')
 
     # date_now = datetime.now()

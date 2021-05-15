@@ -13,5 +13,5 @@ urlpatterns = [
     path('delete_assignment/<int:id>', views.delete_assignment, name = 'delete_assignment'),
     path('delete_collection/<int:id>', views.delete_collection, name = 'delete_collection'),
     path('change_complete/<int:id>', views.change_complete, name = 'change_complete'),
-    path('calculate-hours/', views.calculate_hours, name = 'calculate_hours'),
+    path('calculate_hours/', views.calculate_hours, name = 'calculate_hours'),
 ]

@@ -11,32 +11,34 @@
         <!-- Home top -->
         <div class="row">
             <div class="col-6">
-                <h2 class="m-3">Hours to Go!</h2>
                 <h4 class="m-3">Welcome {{ logged_user.first_name }}</h4>
-                <p>This page is desgined for students(aren't we all students?) to make sets of assignments that belong
+                <h5>Goal -->   Average 9 Hours a day TIL JUNE 1st</h5>
+                <p>BIG PICTURE, If you hold yourself to working those 9 hours everyday then by your birthday the you will complete the following:</p>
+                <ul>
+                    <li>A Pursuit of my coding career</li>
+                    <li>A Portfolio and Resume</li>
+                    <li>A Deeper understanding of Front-End, Back-End, Security, DOM Manipulation, Hosting, Launching</li>
+                    <li>A Rebuilt Habit of Meditation, Workouts, and Cleaning </li>
+                    <li>A finished interior on the Van</li>
+                </ul>
+
+                <!-- <p>This page is desgined for students(aren't we all students?) to make sets of assignments that belong
                     to a Course, just like in elementary! For each assignment you estimate the minimum and maximum
                     hours
                     you think it will take, when they are due, and more. </p>
                 <p>Then you can use the "Hours to Go!" calculator to set a date in the future and it will figure out how
-                    many hours on assignments need to be completed by then!</p>
+                    many hours on assignments need to be completed by then!</p> -->
             </div>
             <div class="col-6">
                 <div class="mt-4 card">
-                    <div class="card-header">Hours to Go!</div>
                     <div class="card-body" id="hours_card">
                         <p>To Calculate Hours to Go, Choose a Date & How Many Days You Have Available.</p>
-                        <form action="/calculate-hours/" method="POST">
+                        <form action="/calculate_hours/" method="POST">
                             {% csrf_token %}
                             <div class="row">
-                                {% if request.session.due_date %}
                                 <div class="col-6">
                                     <input type="date" name="due_date" id="due_date" class="form-control" value="{{due_date}}">
                                 </div>
-                                {% else %}
-                                <div class="col-6">
-                                    <input type="date" name="due_date" id="due_date" class="form-control">
-                                </div>
-                                {% endif %}
                                 <div class="col-2">
                                     <input type="number" name="days_available" id="days_available" class="form-control" value="{{days_available}}">
                                 </div>
@@ -51,6 +53,8 @@
                     <h5>Hours to Go!</h5>
                     <p>You need to average  <span class='h4'>{{min_avg}} - {{max_avg}},</span> or <span class='h4'>{{mid_avg}}</span> hours a day.</p>
                     <p>You have  <span class='h4'>{{min_total}} - {{max_total}}</span>  hours to go.</p>
+                    <p>You have completed <span class='h4'>{{completed_min}} - {{completed_max}}</span>  hours since April 1st.</p>
+
                 </div>
             </div>
         </div>
@@ -76,7 +80,7 @@
                         data-toggle="modal" data-target="#{{assignment.name}}Modal"
                         data-whatever="@fat">{{ assignment.name }}</button></td>
                 <td class="assignmentCollection assignmentData" name="collection"><button type="button"
-                        class="ml-2 btn btn-primary" data-toggle="modal"
+                        class="ml-2 btn btn-secondary" data-toggle="modal"
                         data-target="#ass_{{assignment.collection.name}}Modal" data-whatever="@fat">{{assignment.collection.name}}</td>
                 <td class="assignmentDueDate assignmentData" name="due_date">{{assignment.due_date|date:'Y-m-d' }}</td>
                 <td class="assignmentPriority assignmentData" name="priority">{{assignment.priority}}</td>
@@ -257,7 +261,7 @@
                         data-toggle="modal" data-target="#{{assignment.name}}Modal"
                         data-whatever="@fat">{{ assignment.name }}</button></td>
                 <td class="assignmentCollection assignmentData" name="collection"><button type="button"
-                        class="ml-2 btn btn-primary" data-toggle="modal"
+                        class="ml-2 btn btn-secondary" data-toggle="modal"
                         data-target="#ass_{{assignment.collection.name}}Modal"
                         data-whatever="@fat">{{assignment.collection.name }}</button></td>
                 <td class="assignmentDueDate assignmentData" name="due_date">{{assignment.due_date|date:'Y-m-d' }}</td>
@@ -582,6 +586,71 @@
 
 
     </div>
+
+    <!-- <div class="tab-pane fade" id="nav-worklog" role="tabpanel" aria-labelledby="nav-worklog-tab">
+                <div class="row">
+            <form action="">
+            <div class="col-3">
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" name="date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="hours">Hours</label>
+                    <input type="hours" name="hours" class="form-control">
+                </div>
+                <div class="row">
+                    <button type="submit">Create</button>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea name="description" class="form-control">
+                </div>
+            </div>
+            </form>
+        </div>
+
+    </div> -->
+
+
+    <!-- Worklog panel -->
+    <div class="tab-pane fade" id="nav-worklog" role="tabpanel" aria-labelledby="nav-worklog-tab">
+        <br>
+        <h3>Worklog</h3>
+        {% if messages %}
+        {% for message in messages %}
+        <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+        <form action="">
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" name="date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="hours">Hours</label>
+                        <input type="number" step="any" name="hours" class="form-control">
+                    </div>
+                    <div class="row">
+                        <button type="submit">Create</button>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea name="description" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+
 
     <!-- ADD Assignment panel -->
     <div class="tab-pane fade" id="nav-add_assignment" role="tabpanel" aria-labelledby="nav-add_assignment-tab">
